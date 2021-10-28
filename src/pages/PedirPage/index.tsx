@@ -69,6 +69,25 @@ function PedirPage() {
     })();
   }, []);
 
+  async function getLocation(){
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== 'granted') {
+      setErrorMsg('Permission to access location was denied');
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude
+    });
+  }
+
+  setTimeout(() => {
+    getLocation()
+    console.log(location)
+  }, 3000);
+
   function handleGetEstacaoProxima(){
     api.post('bike/cordenadas', {
       "latitude": 	location.latitude,
