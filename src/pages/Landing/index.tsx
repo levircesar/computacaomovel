@@ -17,9 +17,9 @@ function Landing(){
   const [totalConnections, setTotalConnections] = useState(0);
 
   useEffect(() => {
-    api.get('connections').then(res=>{
-      const {total} = res.data;
-      setTotalConnections(total);
+    api.get('bike').then(res=>{
+      const result = res.data;
+      setTotalConnections(result.length);
     })
   }, [])
   function handleNavigateToDevolverPage(){
@@ -29,6 +29,8 @@ function Landing(){
   function handleNavigatePedirPage(){
     navigate('PedirPage');
   }
+
+  
   
   return (
     <View style={styles.container}>
@@ -59,7 +61,7 @@ function Landing(){
       </View>
       
       <Text style={styles.totalConnections}>
-        Total de {totalConnections} vezes utilizado {'\n'}
+        Total de {totalConnections} estações cadastradas {'\n'}
         <Image source={heartIcon}/>
       </Text>
 
