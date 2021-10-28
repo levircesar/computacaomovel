@@ -7,37 +7,39 @@ import styles from './styles';
 import api from '../../services/api';
 import * as Location from 'expo-location';
 interface Props{
-  distancia:{
-    distance: string
-    distance_earth_radians: number
-    unit: string
-    toString: any
-  }
-  mylocation:{
-    lat: number
-    lon: number
-  }
-  estacao:{
-    localizacao:[]
-    nome: string
-    geometry: any;
-    type: string
-    properties : {
-      qtd_bikes_disp_1: string
-      statusInterno:string
-      status_operacional:string
-      qtd_bikes_total:string
-      nome: string
-      endereco:string
-      qtd_bikes_disp_2:string
-      id: number
-      status_online:string
+  dados: {
+    distancia:{
+      distance: string
+      distance_earth_radians: number
+      unit: string
+      toString: any
     }
-  } 
+    mylocation:{
+      lat: number
+      lon: number
+    }
+    estacao:{
+      localizacao:[]
+      nome: string
+      geometry: any;
+      type: string
+      properties : {
+        qtd_bikes_disp_1: string
+        statusInterno:string
+        status_operacional:string
+        qtd_bikes_total:string
+        nome: string
+        endereco:string
+        qtd_bikes_disp_2:string
+        id: number
+        status_online:string
+      }
+    } 
+  }
 }
 
 function PedirPage() {
-  const [location, setLocation] = useState({});
+  const [location, setLocation] = useState<any>({});
   const [errorMsg, setErrorMsg] = useState('');
   const [estacaoProxima , setEstacaoProxima] = useState<Props | undefined>()
 
@@ -51,13 +53,6 @@ function PedirPage() {
     Linking.openURL('https://levirlemos.online');
   }
 
-  function handleGetEstacaoProxima(){
-    api.get('bike/cordenadas').then(res=>{
-      const result = res.data;
-      console.log(result)
-      setEstacaoProxima(result)
-    })
-  }
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestPermissionsAsync();
@@ -74,7 +69,16 @@ function PedirPage() {
     })();
   }, []);
 
-  
+  function handleGetEstacaoProxima(){
+    api.post('bike/cordenadas', {
+      "latitude": 	location.latitude,
+      "longitude":  location.longitude,
+    }).then(res=>{
+      const result = res.data;
+      console.log(result)
+      setEstacaoProxima(result)
+    })
+  }
   let text = 'Waiting..';
   if (errorMsg) {
     text = errorMsg;
@@ -114,16 +118,16 @@ function PedirPage() {
       {estacaoProxima != null &&(    
         <>
         <Text>
-            {estacaoProxima.estacao.properties.nome}
+            {estacaoProxima.dados.estacao.properties.nome}
           </Text>
           <Text>
-          {estacaoProxima.distancia.distance}
+          {estacaoProxima.dados.distancia.distance}
           </Text>
           <Text>
-            {estacaoProxima.estacao.properties.qtd_bikes_total}
+            {estacaoProxima.dados.estacao.properties.qtd_bikes_total}
           </Text>
           <Text>
-            {estacaoProxima.estacao.properties.endereco}
+            {estacaoProxima.dados.estacao.properties.endereco}
           </Text>
         </>
   
