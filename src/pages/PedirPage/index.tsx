@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { View , ImageBackground, Text, Linking } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View , ImageBackground, Text, Linking,Platform,StyleSheet  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RectButton } from 'react-native-gesture-handler';
 import giveClassesBgImage from '../../assets/images/give-classes-background.png';
 import styles from './styles';
 import api from '../../services/api';
-
+import * as Location from 'expo-location';
 interface Props{
   distancia:{
     distance: string
@@ -37,7 +37,8 @@ interface Props{
 }
 
 function PedirPage() {
-
+  const [location, setLocation] = useState({});
+  const [errorMsg, setErrorMsg] = useState('');
   const [estacaoProxima , setEstacaoProxima] = useState<Props | undefined>()
 
   const {goBack} = useNavigation();
@@ -57,7 +58,29 @@ function PedirPage() {
       setEstacaoProxima(result)
     })
   }
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
 
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      });
+    })();
+  }, []);
+
+  
+  let text = 'Waiting..';
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = JSON.stringify(location);
+  }
   return (
     <View style={styles.container}>
        {/*
@@ -69,6 +92,9 @@ function PedirPage() {
         
       </ImageBackground>
       */}
+      <View style={styles.container}>
+        <Text>{text}</Text>
+      </View>
       <Text style={styles.title}>Página Pedir</Text>
       <Text style={styles.description}>
           Template padrão
